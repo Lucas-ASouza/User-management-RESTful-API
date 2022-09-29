@@ -100,38 +100,46 @@ class User {
 
     }
     
+    toJSON(){
+
+        let json = {};
+
+        Object.keys(this).forEach(key =>{
+        //para cada uma das chaves dentro do objeto, faça:
+           if (this[key] !== undefined) json[key] = this[key];
+
+        });
+
+        return json;
+    }
+
     save(){
 
-        let users = User.getUsersStorage();
+        return new Promise((resolve, reject)=>{
+        
+         let promise;   
 
-        if (this.id >0) {
-            //caso ID já exista, trata-se de uma edição de um usuário já existente
-           
-            users.map(u=>{
+            if (this.id){
+                //se tiver ID, put, delete, find one...
+                promise = HttpRequest.put(`/users/${this.id}`, this.toJSON())
+            } else {
+                //não tiver ID, trata-se de um POST de um cadastro novo
+                promise = HttpRequest.post(`/users/`, this.toJSON())
+            }
+    
+            promise.then(data => {
+    
+                this.loadFromJSON(data);
 
-                if (u._id == this.id){
+                resolve(this);
+    
+            }).catch(e=>{
 
-                    Object.assign(u, this);
-                    //manter o que está igual do this, sobrescrever o diferente
-                }
-
-                return u;
-
+                reject(e);
             });
 
+        });
 
-        } else {
-            //Id inexistente, inserindo usuário novo
-            this._id = this.getNewId();
-
-            users.push(this);
-
-        
-        }
-        localStorage.setItem("users", JSON.stringify(users));
-        //sessionStorage.setItem("users", JSON.stringify(users));
-            //primeiro parâmetro = nome(chave) do segundo parâmetro
-            //segundo parâmetro = valor do parâmetro
     }
 
     removeUser(){
