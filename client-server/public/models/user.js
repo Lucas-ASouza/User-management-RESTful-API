@@ -71,31 +71,11 @@ class User {
 
     }
 
-    getNewId(){
-        
-        let usersID = parseInt(localStorage.getItem("usersID"));
-
-        if (!usersID > 0) usersID = 0;
-        
-        usersID++;
-
-        localStorage.setItem("usersID", usersID);
-
-        return usersID;
-
-    }
 
     static getUsersStorage(){
-        
-        let users = [];
 
-        if(localStorage.getItem("users")){
-        //veririficar se já existe um array, para não criar outro    
 
-            users = JSON.parse(localStorage.getItem("users"));
-
-        }
-        return users;  
+        return HttpRequest.get('/users')
 
 
     }
@@ -144,19 +124,9 @@ class User {
 
     removeUser(){
 
-        let users = User.getUsersStorage();
 
-        users.forEach((userData, index)=>{
+       return HttpRequest.delete(`/users/${this.id}`);
 
-            if (this._id == userData._id){
-
-                users.splice(index, 1);
-
-            }
-
-        });
-
-        localStorage.setItem("users", JSON.stringify(users));
 
     }
 
